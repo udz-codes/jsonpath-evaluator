@@ -15,9 +15,10 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { GoChevronDown } from "react-icons/go";
 
-const Header = () => {
+import {QueryContext} from '../App'
 
-    const [position, setPosition] = React.useState("JSONPath")
+const Header = () => {
+    const {inputText, queryLanguage, setInputText, setQueryLanguage} = React.useContext(QueryContext);
 
     return (
         <div className='flex flex-col p-6'>
@@ -28,20 +29,20 @@ const Header = () => {
                 <DropdownMenu>
                     <DropdownMenuTrigger className='mr-6'>
                         <Button variant="ghost">
-                            {position}
+                            {queryLanguage}
                             <GoChevronDown className='ml-2'/>
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
                         <DropdownMenuLabel>Select query language</DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuRadioGroup value={position} onValueChange={setPosition}>
+                        <DropdownMenuRadioGroup value={queryLanguage} onValueChange={setQueryLanguage}>
                             <DropdownMenuRadioItem value="JSONPath">JSONPath</DropdownMenuRadioItem>
                             <DropdownMenuRadioItem value="JMESPath">JMESPath</DropdownMenuRadioItem>
                         </DropdownMenuRadioGroup>
                     </DropdownMenuContent>
                 </DropdownMenu>
-                <Input/>
+                <Input value={inputText} onChange={(e) => setInputText(e.target.value)}/>
             </div>
         </div>
     )
