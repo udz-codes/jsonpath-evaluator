@@ -2,10 +2,11 @@ import * as React from "react";
 import JsonInput from "./JsonInput";
 import { QueryContext } from '../App';
 import { JSONPath } from "jsonpath-plus";
+import Sample from './Sample.json';
 
 const InputBody = () => {
     const {inputText} = React.useContext(QueryContext);
-    const [jsonInputText, setJsonInputText] = React.useState();
+    const [jsonInputText, setJsonInputText] = React.useState(JSON.stringify(Sample, null, 4));
     const [jsonOutputText, setJsonOutputText] = React.useState();
 
     React.useEffect(() => {

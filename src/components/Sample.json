@@ -1,0 +1,32 @@
+{
+    "jokes": [
+      {
+        "setup": "Why did the programmer quit his job?",
+        "punchline": "Because he didn't get arrays."
+      },
+      {
+        "setup": "What did the array say after it was extended?",
+        "punchline": "Stop objectifying me."
+      },
+      {
+        "setup": "How many programmers does it take to change a lightbulb?",
+        "punchline": "None, that's a hardware problem."
+      },
+      {
+        "setup": "Why do programmers always mix up Halloween and Christmas?",
+        "punchline": "Because Oct 31 = Dec 25!"
+      },
+      {
+        "setup": "What do you call a lazy programmer?",
+        "punchline": "A procrastinator."
+      },
+      {
+        "setup": "How do you console a JavaScript programmer?",
+        "punchline": "You try, but they're probably just gonna console.log it."
+      },
+      {
+        "setup": "What do you call a programmer who doesn't know how to code?",
+        "punchline": "A support engineer."
+      }
+    ]
+  }

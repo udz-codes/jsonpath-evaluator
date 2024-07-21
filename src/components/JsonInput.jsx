@@ -10,10 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import { GoChevronDown } from "react-icons/go";
-import AceEditor from "react-ace";
-import "ace-builds/src-noconflict/theme-twilight";
-import "ace-builds/src-noconflict/mode-json";
-import "ace-builds/src-noconflict/ext-language_tools";
+import Editor from '@monaco-editor/react';
 
 const JsonInput = (props) => {
   const { title, readOnly, value, onChange } = props;
@@ -106,16 +103,15 @@ const JsonInput = (props) => {
           </DropdownMenu>
         )}
       </div>
-      <AceEditor
-        mode="json"
-        theme="twilight"
-        height="700px"
-        width="auto"
-        name="editor"
-        editorProps={{ $blockScrolling: true }}
-        readOnly={readOnly}
+      <Editor
+        theme="vs-dark"
+        height="70vh"
+        language="json"
         value={cleanedValue}
         onChange={onChange}
+        options={{
+          readOnly: readOnly
+        }}
       />
     </>
   );

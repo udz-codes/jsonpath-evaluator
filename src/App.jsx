@@ -11,7 +11,7 @@ export const QueryContext = createContext({
 });
 
 function App() {
-  const [inputText, setInputText] = useState("$.")
+  const [inputText, setInputText] = useState("$.jokes[0]")
   const [queryLanguage, setQueryLanguage] = useState("JSONPath")
 
   return (
