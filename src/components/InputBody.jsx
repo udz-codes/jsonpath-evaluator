@@ -20,11 +20,11 @@ const InputBody = () => {
     }, [jsonInputText, inputText]);
 
     return (
-        <div className='flex flex-row p-6 pt-0'>
-            <div className="flex flex-col grow">
+        <div className='flex flex-row p-6 pt-0' style={{width: '100vw'}}>
+            <div className="flex flex-col grow mr-3" style={{width: '50vw'}}>
                 <JsonInput title="Input" value={jsonInputText} onChange={setJsonInputText} />
             </div>
-            <div className="flex flex-col grow ml-6">
+            <div className="flex flex-col grow ml-3" style={{width: '50vw'}}>
                 <JsonInput title="Output" value={jsonOutputText} readOnly={true}/>
             </div>
         </div>
