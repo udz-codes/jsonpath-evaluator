@@ -58,16 +58,11 @@ const JsonInput = (props) => {
   ]);
 
   const copyToClipboard = () => {
-    toast({
-      description: "Copied to clipboard!"
-    })
     navigator.clipboard.writeText(cleanedValue).then(() => {
-      console.log("Yay")
       toast({
         description: "Copied to clipboard!"
       })
     }).catch(err => {
-      console.log("Nay")
       toast({
         title: "Error copying to clipboard",
         description: err
