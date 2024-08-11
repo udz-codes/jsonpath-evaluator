@@ -5,6 +5,7 @@ import InputBody from './components/InputBody'
 import SpreadSheet from './components/SpreadSheet'
 import { Toaster } from "@/components/ui/toaster"
 import Footer from './components/Footer'
+import { SpreadsheetProvider } from './components/SpreadsheetContext';
 
 export const QueryContext = createContext({
   inputText: '',
@@ -19,13 +20,15 @@ function App() {
 
   return (
     <QueryContext.Provider value={{inputText, queryLanguage, setInputText, setQueryLanguage}}>
-      <div className='bg-primary text-primary-foreground'>
-        <Header />
-        <InputBody />
-        <SpreadSheet />
-        <Toaster />
-        <Footer />
-      </div>
+      <SpreadsheetProvider>
+        <div className='bg-primary text-primary-foreground'>
+          <Header />
+          <InputBody />
+          <SpreadSheet />
+          <Toaster />
+          <Footer />
+        </div>
+      </SpreadsheetProvider>
     </QueryContext.Provider>
   )
 }

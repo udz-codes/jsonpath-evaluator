@@ -1,13 +1,14 @@
 "use client"
- 
+
 import * as React from "react"
 import { Button } from "@/components/ui/button"
 import { TfiArrowCircleLeft } from "react-icons/tfi";
 import { RiArrowRightWideLine, RiSettingsLine } from "react-icons/ri";
 import Spreadsheet from "react-spreadsheet";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
-import { TbColumnInsertLeft, TbRowInsertTop } from "react-icons/tb";
+import { TbColumnInsertLeft, TbColumnInsertRight, TbRowInsertTop, TbRowInsertBottom } from "react-icons/tb";
 import ExportData from "./ExportData";
+import { SpreadsheetContext } from "./SpreadsheetContext"
 import {
     Menubar,
     MenubarContent,
@@ -24,33 +25,41 @@ import {
 
 const SpreadSheet = () => {
     const [drawerOpen, setDrawerOpen] = React.useState(false)
-    const [spreadSheetData, setSpreadSheetData] = React.useState(() => generateSpreadsheetGrid(30, 20));
+    const { spreadSheetData, setSpreadSheetData } = React.useContext(SpreadsheetContext);
 
-    function generateSpreadsheetGrid(numRows, numColumns) {
-        const data = [];
-        for (let i = 0; i < numRows; i++) {
-          const row = [];
-          for (let j = 0; j < numColumns; j++) {
-            row.push({});
-          }
-          data.push(row);
-        }
-        return data;
-    }
-
-    function addColumn() {
+    // Add column to the end
+    function addColumnToEnd() {
         const newColumn = {};
         const newData = spreadSheetData.map(row => {
-          return [...row, newColumn];
+            return [...row, newColumn];
         });
 
         setSpreadSheetData(newData);
     }
 
-    function addRow() {
+    // Add row to the end
+    function addRowToEnd() {
         const newRow = Array(spreadSheetData[0].length).fill({});
         const newData = [...spreadSheetData, newRow];
-      
+
+        setSpreadSheetData(newData);
+    }
+
+    // Add column to the start
+    function addColumnToStart() {
+        const newColumn = {};
+        const newData = spreadSheetData.map(row => {
+            return [newColumn, ...row];
+        });
+
+        setSpreadSheetData(newData);
+    }
+
+    // Add row to the start
+    function addRowToStart() {
+        const newRow = Array(spreadSheetData[0].length).fill({});
+        const newData = [newRow, ...spreadSheetData];
+
         setSpreadSheetData(newData);
     }
 
@@ -63,20 +72,25 @@ const SpreadSheet = () => {
             </div>
             <Drawer direction="left" open={drawerOpen} onOpenChange={setDrawerOpen} preventCycle={true} handleOnly={true}>
                 <DrawerContent className="h-full w-90 pl-6 pr-6">
+                    
                     {/* Menu Bar */}
                     <div className="flex flex-row justify-between align-items-center w-full mb-6">
-                        {/* <p className="fixed flex justify-self-center text-zinc-300 text-3xl decoration-1">SHEET</p> */}
                         <Menubar>
+                            
                             {/* Export functionality */}
                             <ExportData data={spreadSheetData} />
+                            
                             {/* Spreadsheet action */}
                             <MenubarMenu>
                                 <MenubarTrigger>Actions<RiSettingsLine className='ml-3 text-lg'/></MenubarTrigger>
-                                <MenubarSeparator />
                                 <MenubarContent>
-                                    <MenubarItem onClick={addColumn}><TbColumnInsertLeft className='mr-3 text-lg'/>Add column</MenubarItem>
+                                    <MenubarItem onClick={addRowToStart}><TbRowInsertBottom className='mr-3 text-lg'/>Add top row</MenubarItem>
                                     <MenubarSeparator />
-                                    <MenubarItem onClick={addRow}><TbRowInsertTop className='mr-3 text-lg'/>Add row</MenubarItem>
+                                    <MenubarItem onClick={addRowToEnd}><TbRowInsertTop className='mr-3 text-lg'/>Add bottom row</MenubarItem>
+                                    <MenubarSeparator />
+                                    <MenubarItem onClick={addColumnToStart}><TbColumnInsertRight className='mr-3 text-lg'/>Add start column</MenubarItem>
+                                    <MenubarSeparator />
+                                    <MenubarItem onClick={addColumnToEnd}><TbColumnInsertLeft className='mr-3 text-lg'/>Add end column</MenubarItem>
                                 </MenubarContent>
                             </MenubarMenu>
                         </Menubar>
@@ -84,6 +98,7 @@ const SpreadSheet = () => {
                             <TfiArrowCircleLeft className='text-3xl m-0 p-0'/>
                         </Button>
                     </div>
+                    
                     {/* Spreadsheet Area */}
                     <ScrollArea orientation="horizontal" className="h-5/6 w-full rounded-lg border p-4">
                         <Spreadsheet data={spreadSheetData} onChange={setSpreadSheetData} />
@@ -95,4 +110,4 @@ const SpreadSheet = () => {
     )
 }
 
-export default SpreadSheet
+export default SpreadSheet;

@@ -22,15 +22,26 @@ const ExportData = (props) => {
         return value;
     };
 
+    const filterEmptyRowsAndColumns = (data) => {
+        // Remove completely empty rows
+        const nonEmptyRows = data.filter(row => row.some(cell => cell.value !== undefined && cell.value.trim() !== ''));
+
+        // Remove completely empty columns
+        const nonEmptyCols = nonEmptyRows[0]?.map((_, colIndex) => 
+            nonEmptyRows.map(row => row[colIndex])
+        ).filter(column => column.some(cell => cell.value !== undefined && cell.value.trim() !== ''));
+
+        // Transpose the filtered columns back to rows
+        const filteredData = nonEmptyCols[0]?.map((_, rowIndex) => 
+            nonEmptyCols.map(column => column[rowIndex])
+        ) || [];
+
+        return filteredData;
+    };
+
     const handleDownloadClick = () => {
-        const filteredData = data.filter(row => row.some(cell => cell.value !== undefined));
-        if (!filteredData.length) {
-            return [];
-        }
-        const transposedData = filteredData[0].map((_, colIndex) => filteredData.map(row => row[colIndex]));
-        const filteredColumns = transposedData.filter(column => column.some(cell => cell.value !== undefined));
-        const transposedBack = filteredColumns[0].map((_, rowIndex) => filteredColumns.map(column => column[rowIndex]));
-        const csvContent = transposedBack.map(row => 
+        const filteredData = filterEmptyRowsAndColumns(data);
+        const csvContent = filteredData.map(row => 
             row.map(cell => escapeAndQuoteValue(cell.value || ''))
             .join(',')
         ).join('\n');
@@ -38,14 +49,8 @@ const ExportData = (props) => {
     };
 
     const handleDownloadTSV = () => {
-        const filteredData = data.filter(row => row.some(cell => cell.value !== undefined));
-        if (!filteredData.length) {
-            return [];
-        }
-        const transposedData = filteredData[0].map((_, colIndex) => filteredData.map(row => row[colIndex]));
-        const filteredColumns = transposedData.filter(column => column.some(cell => cell.value !== undefined));
-        const transposedBack = filteredColumns[0].map((_, rowIndex) => filteredColumns.map(column => column[rowIndex]));
-        const tsvContent = transposedBack.map(row => 
+        const filteredData = filterEmptyRowsAndColumns(data);
+        const tsvContent = filteredData.map(row => 
             row.map(cell => (cell.value || '').trim().replace(/\t/g, ' '))
             .join('\t')
         ).join('\n');
@@ -73,14 +78,8 @@ const ExportData = (props) => {
     };
 
     const downloadXLSX = () => {
-        const filteredData = data.filter(row => row.some(cell => cell.value !== undefined));
-        if (!filteredData.length) {
-            return [];
-        }
-        const transposedData = filteredData[0].map((_, colIndex) => filteredData.map(row => row[colIndex]));
-        const filteredColumns = transposedData.filter(column => column.some(cell => cell.value !== undefined));
-        const transposedBack = filteredColumns[0].map((_, rowIndex) => filteredColumns.map(column => column[rowIndex]));
-        const sheetData = transposedBack.map(row => row.map(cell => cell.value || ''));
+        const filteredData = filterEmptyRowsAndColumns(data);
+        const sheetData = filteredData.map(row => row.map(cell => cell.value || ''));
         const ws = XLSX.utils.aoa_to_sheet(sheetData);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
