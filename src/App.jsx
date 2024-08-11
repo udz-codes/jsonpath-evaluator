@@ -2,6 +2,8 @@ import { useState, createContext } from 'react'
 import './App.css'
 import Header from './components/Header'
 import InputBody from './components/InputBody'
+import SpreadSheet from './components/SpreadSheet'
+import { Toaster } from "@/components/ui/toaster"
 
 export const QueryContext = createContext({
   inputText: '',
@@ -19,6 +21,8 @@ function App() {
       <div className='bg-primary text-primary-foreground'>
         <Header />
         <InputBody />
+        <SpreadSheet />
+        <Toaster />
       </div>
     </QueryContext.Provider>
   )
