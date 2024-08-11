@@ -38,7 +38,7 @@ const Header = () => {
                         <DropdownMenuSeparator />
                         <DropdownMenuRadioGroup value={queryLanguage} onValueChange={setQueryLanguage}>
                             <DropdownMenuRadioItem value="JSONPath">JSONPath</DropdownMenuRadioItem>
-                            <DropdownMenuRadioItem value="JMESPath">JMESPath</DropdownMenuRadioItem>
+                            <DropdownMenuRadioItem value="JMESPath" disabled>JMESPath</DropdownMenuRadioItem>
                         </DropdownMenuRadioGroup>
                     </DropdownMenuContent>
                 </DropdownMenu>
