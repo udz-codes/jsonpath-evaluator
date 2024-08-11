@@ -4,6 +4,7 @@ import Header from './components/Header'
 import InputBody from './components/InputBody'
 import SpreadSheet from './components/SpreadSheet'
 import { Toaster } from "@/components/ui/toaster"
+import Footer from './components/Footer'
 
 export const QueryContext = createContext({
   inputText: '',
@@ -23,6 +24,7 @@ function App() {
         <InputBody />
         <SpreadSheet />
         <Toaster />
+        <Footer />
       </div>
     </QueryContext.Provider>
   )
