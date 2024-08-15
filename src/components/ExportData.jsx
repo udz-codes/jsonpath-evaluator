@@ -23,21 +23,27 @@ const ExportData = (props) => {
     };
 
     const filterEmptyRowsAndColumns = (data) => {
+        if (!data || data.length === 0) return [];
+    
         // Remove completely empty rows
-        const nonEmptyRows = data.filter(row => row.some(cell => cell.value !== undefined && cell.value.trim() !== ''));
-
+        const nonEmptyRows = data.filter(row => row && row.some(cell => cell && cell.value !== undefined && cell.value.trim() !== ''));
+    
+        if (nonEmptyRows.length === 0) return [];
+    
         // Remove completely empty columns
         const nonEmptyCols = nonEmptyRows[0]?.map((_, colIndex) => 
             nonEmptyRows.map(row => row[colIndex])
-        ).filter(column => column.some(cell => cell.value !== undefined && cell.value.trim() !== ''));
-
+        ).filter(column => column.some(cell => cell && cell.value !== undefined && cell.value.trim() !== ''));
+    
+        if (!nonEmptyCols || nonEmptyCols.length === 0) return [];
+    
         // Transpose the filtered columns back to rows
         const filteredData = nonEmptyCols[0]?.map((_, rowIndex) => 
-            nonEmptyCols.map(column => column[rowIndex])
+            nonEmptyCols.map(column => column[rowIndex] || { value: '' })
         ) || [];
-
+    
         return filteredData;
-    };
+    };    
 
     const handleDownloadClick = () => {
         const filteredData = filterEmptyRowsAndColumns(data);

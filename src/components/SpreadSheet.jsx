@@ -3,12 +3,12 @@
 import * as React from "react"
 import { Button } from "@/components/ui/button"
 import { TfiArrowCircleLeft } from "react-icons/tfi";
-import { RiArrowRightWideLine, RiSettingsLine } from "react-icons/ri";
+import { RiArrowRightWideLine, RiSettingsLine, RiDeleteBinLine } from "react-icons/ri";
 import Spreadsheet from "react-spreadsheet";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { TbColumnInsertLeft, TbColumnInsertRight, TbRowInsertTop, TbRowInsertBottom } from "react-icons/tb";
 import ExportData from "./ExportData";
-import { SpreadsheetContext } from "./SpreadsheetContext"
+import { SpreadsheetContext, generateSpreadsheetGrid} from "./SpreadsheetContext"
 import {
     Menubar,
     MenubarContent,
@@ -63,6 +63,12 @@ const SpreadSheet = () => {
         setSpreadSheetData(newData);
     }
 
+    // Empty the sheet
+    function cleanSheet() {
+        const newData = generateSpreadsheetGrid(30, 20);
+        setSpreadSheetData(newData)
+    }
+
     return (
         <>
             <div className="h-full">
@@ -72,7 +78,6 @@ const SpreadSheet = () => {
             </div>
             <Drawer direction="left" open={drawerOpen} onOpenChange={setDrawerOpen} preventCycle={true} handleOnly={true}>
                 <DrawerContent className="h-full w-90 pl-6 pr-6">
-                    
                     {/* Menu Bar */}
                     <div className="flex flex-row justify-between align-items-center w-full mb-6">
                         <Menubar>
@@ -91,6 +96,8 @@ const SpreadSheet = () => {
                                     <MenubarItem onClick={addColumnToStart}><TbColumnInsertRight className='mr-3 text-lg'/>Add start column</MenubarItem>
                                     <MenubarSeparator />
                                     <MenubarItem onClick={addColumnToEnd}><TbColumnInsertLeft className='mr-3 text-lg'/>Add end column</MenubarItem>
+                                    <MenubarSeparator />
+                                    <MenubarItem onClick={cleanSheet}><RiDeleteBinLine className='mr-3 text-lg'/>Clean sheet</MenubarItem>
                                 </MenubarContent>
                             </MenubarMenu>
                         </Menubar>
@@ -100,8 +107,8 @@ const SpreadSheet = () => {
                     </div>
                     
                     {/* Spreadsheet Area */}
-                    <ScrollArea orientation="horizontal" className="h-5/6 w-full rounded-lg border p-4">
-                        <Spreadsheet data={spreadSheetData} onChange={setSpreadSheetData} />
+                    <ScrollArea orientation="horizontal" className="h-5/6 w-full rounded-lg border" style={{ userSelect: 'all' }}>
+                        <Spreadsheet data={spreadSheetData} onChange={setSpreadSheetData}/>
                         <ScrollBar orientation="horizontal" />
                     </ScrollArea>
                 </DrawerContent>
