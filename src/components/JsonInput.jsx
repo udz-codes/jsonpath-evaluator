@@ -76,49 +76,64 @@ const JsonInput = (props) => {
 
   const pushToSheet = () => {
     const lines = cleanedValue.split("\n");
-  
-    // Track if an empty column is found and is not between used columns
-    let emptyColumnIndex = -1;
-  
-    for (let col = 0; col < spreadSheetData[0].length; col++) {
-      let isEmptyColumn = true;
-  
-      for (let row = 0; row < spreadSheetData.length; row++) {
-        if (spreadSheetData[row][col].value) {
-          isEmptyColumn = false;
-          break;
+
+    setSpreadSheetData(prevData => {
+        let spreadSheetData = [...prevData];
+
+        // Track if an empty column is found and is not between used columns
+        let emptyColumnIndex = -1;
+
+        for (let col = 0; col < spreadSheetData[0].length; col++) {
+            let isEmptyColumn = true;
+
+            for (let row = 0; row < spreadSheetData.length; row++) {
+                if (spreadSheetData[row][col].value) {
+                    isEmptyColumn = false;
+                    break;
+                }
+            }
+
+            if (isEmptyColumn) {
+                let prevColumnUsed = col > 0 && spreadSheetData.some(row => row[col - 1].value);
+                let nextColumnUsed = col < spreadSheetData[0].length - 1 && spreadSheetData.some(row => row[col + 1].value);
+
+                if (!prevColumnUsed || !nextColumnUsed) {
+                    emptyColumnIndex = col;
+                    break;
+                }
+            }
         }
-      }
-  
-      if (isEmptyColumn) {
-        let prevColumnUsed = col > 0 && spreadSheetData.some(row => row[col - 1].value);
-        let nextColumnUsed = col < spreadSheetData[0].length - 1 && spreadSheetData.some(row => row[col + 1].value);
-  
-        if (!prevColumnUsed || !nextColumnUsed) {
-          emptyColumnIndex = col;
-          break;
+
+        // If no suitable empty column is found, add a new column
+        if (emptyColumnIndex === -1) {
+            emptyColumnIndex = spreadSheetData[0].length;
+            spreadSheetData.forEach(row => row.push({}));
         }
-      }
-    }
-  
-    // If no suitable empty column is found, add a new column
-    if (emptyColumnIndex === -1) {
-      emptyColumnIndex = spreadSheetData[0].length;
-      spreadSheetData.forEach(row => row.push({}));
-    }
-  
-    // Insert data into the selected column
-    const newData = spreadSheetData.map((row, rowIndex) => {
-      const newRow = [...row];
-      newRow[emptyColumnIndex] = { value: lines[rowIndex] || "" };
-      return newRow;
+
+        // Add extra rows if data exceeds the current number of rows
+        if (lines.length > spreadSheetData.length) {
+            const extraRowsNeeded = lines.length - spreadSheetData.length;
+            const extraRows = Array.from({ length: extraRowsNeeded }, () =>
+                Array(spreadSheetData[0].length).fill({})
+            );
+            spreadSheetData = [...spreadSheetData, ...extraRows];
+        }
+
+        // Insert data into the selected column
+        const newData = spreadSheetData.map((row, rowIndex) => {
+            const newRow = [...row];
+            newRow[emptyColumnIndex] = { value: lines[rowIndex] || "" };
+            return newRow;
+        });
+
+        return newData;
     });
-  
-    setSpreadSheetData(newData);
+
     toast({
-      description: "Data pushed to spreadsheet!"
+        description: "Data pushed to spreadsheet!"
     });
-  };   
+  };
+
 
   return (
     <>
