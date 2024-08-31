@@ -19,6 +19,8 @@ import {QueryContext} from '../App'
 
 const Header = () => {
     const {inputText, queryLanguage, setInputText, setQueryLanguage} = React.useContext(QueryContext);
+    const jsonPathtextColor = "text-teal-600";
+    const jmesPathtextColor = "text-sky-600";
 
     return (
         <div className='flex flex-col p-6'>
@@ -28,7 +30,7 @@ const Header = () => {
             <div className='flex flex-row'>
                 <DropdownMenu>
                     <DropdownMenuTrigger className='mr-6'>
-                        <Button variant="ghost">
+                        <Button variant="ghost" className={queryLanguage === 'JSONPath' ? jsonPathtextColor : jmesPathtextColor}>
                             {queryLanguage}
                             <GoChevronDown className='ml-2'/>
                         </Button>
@@ -37,8 +39,8 @@ const Header = () => {
                         <DropdownMenuLabel>Select query language</DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuRadioGroup value={queryLanguage} onValueChange={setQueryLanguage}>
-                            <DropdownMenuRadioItem value="JSONPath">JSONPath</DropdownMenuRadioItem>
-                            <DropdownMenuRadioItem value="JMESPath" disabled>JMESPath</DropdownMenuRadioItem>
+                            <DropdownMenuRadioItem value="JSONPath" className={jsonPathtextColor}>JSONPath</DropdownMenuRadioItem>
+                            <DropdownMenuRadioItem value="JMESPath" className={jmesPathtextColor}>JMESPath</DropdownMenuRadioItem>
                         </DropdownMenuRadioGroup>
                     </DropdownMenuContent>
                 </DropdownMenu>
