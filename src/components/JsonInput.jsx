@@ -137,8 +137,8 @@ const JsonInput = (props) => {
 
   return (
     <>
-      <div className="p-0 m-0 flex flex-row justify-between">
-        <Label className="mb-3 text-2xl">{title}</Label>
+      <div className="p-0 m-0 flex flex-row justify-between items-center">
+        <Label className="mb-2 mt-2 text-lg uppercase tracking-widest">{title}</Label>
         {readOnly && (
           <TooltipProvider>
             <div className="flex flex-row items-center gap-3">
