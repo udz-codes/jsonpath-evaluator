@@ -6,6 +6,7 @@ import SpreadSheet from './components/SpreadSheet'
 import { Toaster } from "@/components/ui/toaster"
 import Footer from './components/Footer'
 import { SpreadsheetProvider } from './components/SpreadsheetContext';
+import { Analytics } from "@vercel/analytics/react"
 
 export const QueryContext = createContext({
   inputText: '',
@@ -27,6 +28,7 @@ function App() {
           <SpreadSheet />
           <Toaster />
           <Footer />
+          <Analytics />
         </div>
       </SpreadsheetProvider>
     </QueryContext.Provider>
