@@ -17,7 +17,6 @@ import {
 import { GoChevronDown } from "react-icons/go";
 
 import { QueryContext } from "../App";
-import SettingsDialog from "./SettingsDialog";
 
 const Header = () => {
   const { inputText, queryLanguage, setInputText, setQueryLanguage } =
@@ -31,7 +30,6 @@ const Header = () => {
         <p className="scroll-m-20 text-2xl font-extrabold tracking-tight first:mt-0 pb-6">
           JSONpath Evaluator
         </p>
-        <SettingsDialog />
       </div>
 
       <div className="flex flex-row">
