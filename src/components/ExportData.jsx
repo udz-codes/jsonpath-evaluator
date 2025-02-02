@@ -114,7 +114,7 @@ const ExportData = (props) => {
       <MenubarTrigger>
         Export <LuDownloadCloud className="ml-3 text-lg" />
       </MenubarTrigger>
-      <MenubarContent>
+      <MenubarContent className="z-50 pointer-events-auto">
         <MenubarItem onClick={downloadCSV}>as CSV</MenubarItem>
         <MenubarSeparator />
         <MenubarItem onClick={downloadTSV}>as TSV</MenubarItem>

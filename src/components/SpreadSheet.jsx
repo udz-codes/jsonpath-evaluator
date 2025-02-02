@@ -77,7 +77,7 @@ const SpreadSheet = () => {
                 </Button>
             </div>
             <Drawer direction="left" open={drawerOpen} onOpenChange={setDrawerOpen} preventCycle={true} handleOnly={true}>
-                <DrawerContent className="h-full w-90 pl-6 pr-6">
+                <DrawerContent className="h-full w-90 pl-6 pr-6 z-50 pointer-events-auto">
                     {/* Menu Bar */}
                     <div className="flex flex-row justify-between align-items-center w-full mb-6">
                         <Menubar>
@@ -88,7 +88,7 @@ const SpreadSheet = () => {
                             {/* Spreadsheet action */}
                             <MenubarMenu>
                                 <MenubarTrigger>Actions<RiSettingsLine className='ml-3 text-lg'/></MenubarTrigger>
-                                <MenubarContent>
+                                <MenubarContent className="z-50 pointer-events-auto">
                                     <MenubarItem onClick={addRowToStart}><TbRowInsertBottom className='mr-3 text-lg'/>Add top row</MenubarItem>
                                     <MenubarSeparator />
                                     <MenubarItem onClick={addRowToEnd}><TbRowInsertTop className='mr-3 text-lg'/>Add bottom row</MenubarItem>
