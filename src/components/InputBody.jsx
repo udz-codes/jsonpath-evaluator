@@ -1,37 +1,60 @@
 import * as React from "react";
 import JsonInput from "./JsonInput";
-import { QueryContext } from '../App';
+import { QueryContext } from "../App";
 import { JSONPath } from "jsonpath-plus";
 import { search as JMESPath } from "jmespath";
-
-import Sample from './Sample.json';
+import useManagedState from "../hooks/useManagedState";
+import Sample from "../data/Sample.json";
 
 const InputBody = () => {
-    const {inputText, queryLanguage} = React.useContext(QueryContext);
-    const [jsonInputText, setJsonInputText] = React.useState(JSON.stringify(Sample, null, 4));
-    const [jsonOutputText, setJsonOutputText] = React.useState();
+  const { inputText, queryLanguage } = React.useContext(QueryContext);
 
-    React.useEffect(() => {
-        try {
-            const parsedJson = JSON.parse(jsonInputText);
-            const result = queryLanguage === 'JMESPath' ? JMESPath(parsedJson, inputText) : JSONPath({path: inputText, json: parsedJson});
-            setJsonOutputText(JSON.stringify(result, null, 4));
-        } catch (e) {
-            console.error(e);
-            setJsonOutputText('Invalid Json Input');
-        }
-    }, [jsonInputText, inputText, queryLanguage]);
+  // Manage JSON input text with storage
+  const [jsonInputText, setJsonInputText] = useManagedState(
+    JSON.stringify(Sample, null, 4)
+  );
 
-    return (
-        <div className='flex flex-row p-6 pt-0' style={{width: '100vw', height: '85vh'}}>
-            <div className="flex flex-col grow mr-3" style={{width: '50vw'}}>
-                <JsonInput title="Input" value={jsonInputText} onChange={setJsonInputText} />
-            </div>
-            <div className="flex flex-col grow ml-3" style={{width: '50vw'}}>
-                <JsonInput title="Output" value={jsonOutputText} readOnly={true}/>
-            </div>
-        </div>
-    )
-}
+  // Manage JSON output separately
+  const [jsonOutputText, setJsonOutputText] = React.useState();
+
+  // Effect to process JSON input for query evaluation
+  React.useEffect(() => {
+    try {
+      // Parse and process JSON input only if it's valid
+      const parsedJson = JSON.parse(jsonInputText);
+      const result =
+        queryLanguage === "JMESPath"
+          ? JMESPath(parsedJson, inputText)
+          : JSONPath({ path: inputText, json: parsedJson });
+      setJsonOutputText(JSON.stringify(result, null, 4));
+    } catch (e) {
+      console.error("Error parsing or processing JSON:", e);
+      setJsonOutputText("Invalid JSON Input");
+    }
+  }, [jsonInputText, inputText, queryLanguage]);
+
+  // Function to handle JSON input changes and store in local storage
+  const handleJsonInputChange = (value) => {
+    setJsonInputText(value); // Store in local storage regardless of validity
+  };
+
+  return (
+    <div
+      className="flex flex-row p-6 pt-0"
+      style={{ width: "100vw", height: "85vh" }}
+    >
+      <div className="flex flex-col grow mr-3" style={{ width: "50vw" }}>
+        <JsonInput
+          title="Input"
+          value={jsonInputText}
+          onChange={handleJsonInputChange} // Handle input changes without validation
+        />
+      </div>
+      <div className="flex flex-col grow ml-3" style={{ width: "50vw" }}>
+        <JsonInput title="Output" value={jsonOutputText} readOnly={true} />
+      </div>
+    </div>
+  );
+};
 
 export default InputBody;

@@ -6,194 +6,230 @@ import {
   DropdownMenuContent,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu"
-import { Button } from "@/components/ui/button"
-import { TooltipProvider } from "@/components/ui/tooltip"
-import TooltipButton from './TooltipButton'
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import TooltipButton from "./TooltipButton";
 import { GoChevronDown } from "react-icons/go";
-import Editor from '@monaco-editor/react';
+import Editor from "@monaco-editor/react";
 import { RxClipboardCopy, RxUpload } from "react-icons/rx";
-import { useToast } from "@/components/ui/use-toast"
-import { SpreadsheetContext } from "./SpreadsheetContext"
+import { useToast } from "@/components/ui/use-toast";
+import { SpreadsheetContext } from "./SpreadsheetContext";
+import { DEFAULT_CLEANER_SETTINGS_VALUE } from "../data/defaultValues";
 
 const JsonInput = (props) => {
   const { title, readOnly, value, onChange } = props;
-  const { spreadSheetData, setSpreadSheetData } = React.useContext(SpreadsheetContext);
-  const [cleanerSwitch, setCleanersSwitch] = React.useState(false);
+  const { setSpreadSheetData } = React.useContext(SpreadsheetContext);
   const [cleanedValue, setCleanedValue] = React.useState(value);
-  const [removeAllSpace, setRemoveAllSpace] = React.useState(false);
-  const [removeTrailingSpace, setRemoveTrailingSpace] = React.useState(true);
-  const { toast } = useToast()
+
+  const [cleanerOptions, setCleanerOptions] = React.useState(
+    DEFAULT_CLEANER_SETTINGS_VALUE
+  );
+
+  const { toast } = useToast();
 
   const removeWhitespace = (text) => {
     const lines = text.split("\n");
-    const modifiedLines = [];
-
-    for (const line of lines) modifiedLines.push(line.trim());
-
+    const modifiedLines = lines.map((line) => line.trim());
     return modifiedLines.join("\n");
   };
 
   const cleanIt = (data) => {
-    data = data.replaceAll("[", "")
+    let cleanedData = data
+      .replaceAll("[", "")
       .replaceAll("]", "")
       .replaceAll(",", "")
       .replaceAll('"', "")
-      .replace(/^\s*[\r\n]/gm, '');
+      .replace(/^\s*[\r\n]/gm, "");
 
-    if (removeAllSpace) data = data.replace(/ /g, '');
-    if (removeTrailingSpace) data = removeWhitespace(data);
+    if (cleanerOptions.removeAllSpace) {
+      cleanedData = cleanedData.replace(/ /g, "");
+    }
+    if (cleanerOptions.removeTrailingSpace) {
+      cleanedData = removeWhitespace(cleanedData);
+    }
 
-    return data;
+    return cleanedData;
   };
 
   React.useEffect(() => {
-    if (cleanerSwitch) {
+    if (cleanerOptions.enabled) {
       setCleanedValue(cleanIt(value));
     } else {
       setCleanedValue(value);
     }
-  }, [
-    cleanerSwitch,
-    value,
-    removeAllSpace,
-    removeTrailingSpace
-  ]);
+  }, [cleanerOptions, value]);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(cleanedValue).then(() => {
-      toast({
-        description: "Copied to clipboard!"
+    navigator.clipboard
+      .writeText(cleanedValue)
+      .then(() => {
+        toast({
+          description: "Copied to clipboard!",
+        });
       })
-    }).catch(err => {
-      toast({
-        title: "Error copying to clipboard",
-        description: err
-      })
-    });
+      .catch((err) => {
+        toast({
+          title: "Error copying to clipboard",
+          description: err,
+        });
+      });
   };
 
   const pushToSheet = () => {
     const lines = cleanedValue.split("\n");
 
-    setSpreadSheetData(prevData => {
-        let spreadSheetData = [...prevData];
+    setSpreadSheetData((prevData) => {
+      let spreadSheetData = [...prevData];
 
-        // Track if an empty column is found and is not between used columns
-        let emptyColumnIndex = -1;
+      // Track if an empty column is found and is not between used columns
+      let emptyColumnIndex = -1;
 
-        for (let col = 0; col < spreadSheetData[0].length; col++) {
-            let isEmptyColumn = true;
+      for (let col = 0; col < spreadSheetData[0].length; col++) {
+        let isEmptyColumn = true;
 
-            for (let row = 0; row < spreadSheetData.length; row++) {
-                if (spreadSheetData[row][col].value) {
-                    isEmptyColumn = false;
-                    break;
-                }
-            }
-
-            if (isEmptyColumn) {
-                let prevColumnUsed = col > 0 && spreadSheetData.some(row => row[col - 1].value);
-                let nextColumnUsed = col < spreadSheetData[0].length - 1 && spreadSheetData.some(row => row[col + 1].value);
-
-                if (!prevColumnUsed || !nextColumnUsed) {
-                    emptyColumnIndex = col;
-                    break;
-                }
-            }
+        for (let row = 0; row < spreadSheetData.length; row++) {
+          if (spreadSheetData[row][col].value) {
+            isEmptyColumn = false;
+            break;
+          }
         }
 
-        // If no suitable empty column is found, add a new column
-        if (emptyColumnIndex === -1) {
-            emptyColumnIndex = spreadSheetData[0].length;
-            spreadSheetData.forEach(row => row.push({}));
+        if (isEmptyColumn) {
+          let prevColumnUsed =
+            col > 0 && spreadSheetData.some((row) => row[col - 1].value);
+          let nextColumnUsed =
+            col < spreadSheetData[0].length - 1 &&
+            spreadSheetData.some((row) => row[col + 1].value);
+
+          if (!prevColumnUsed || !nextColumnUsed) {
+            emptyColumnIndex = col;
+            break;
+          }
         }
+      }
 
-        // Add extra rows if data exceeds the current number of rows
-        if (lines.length > spreadSheetData.length) {
-            const extraRowsNeeded = lines.length - spreadSheetData.length;
-            const extraRows = Array.from({ length: extraRowsNeeded }, () =>
-                Array(spreadSheetData[0].length).fill({})
-            );
-            spreadSheetData = [...spreadSheetData, ...extraRows];
-        }
+      // If no suitable empty column is found, add a new column
+      if (emptyColumnIndex === -1) {
+        emptyColumnIndex = spreadSheetData[0].length;
+        spreadSheetData.forEach((row) => row.push({}));
+      }
 
-        // Insert data into the selected column
-        const newData = spreadSheetData.map((row, rowIndex) => {
-            const newRow = [...row];
-            newRow[emptyColumnIndex] = { value: lines[rowIndex] || "" };
-            return newRow;
-        });
+      // Add extra rows if data exceeds the current number of rows
+      if (lines.length > spreadSheetData.length) {
+        const extraRowsNeeded = lines.length - spreadSheetData.length;
+        const extraRows = Array.from({ length: extraRowsNeeded }, () =>
+          Array(spreadSheetData[0].length).fill({})
+        );
+        spreadSheetData = [...spreadSheetData, ...extraRows];
+      }
 
-        return newData;
+      // Insert data into the selected column
+      const newData = spreadSheetData.map((row, rowIndex) => {
+        const newRow = [...row];
+        newRow[emptyColumnIndex] = { value: lines[rowIndex] || "" };
+        return newRow;
+      });
+
+      return newData;
     });
 
     toast({
-        description: "Data pushed to spreadsheet!"
+      description: "Data pushed to spreadsheet!",
     });
   };
 
-
   return (
     <>
-      <div className="p-0 m-0 flex flex-row justify-between">
-        <Label className="mb-3 text-2xl">{title}</Label>
+      <div className="p-0 m-0 flex flex-row justify-between items-center">
+        <Label className="mb-2 mt-2 text-lg uppercase tracking-widest">
+          {title}
+        </Label>
         {readOnly && (
           <TooltipProvider>
             <div className="flex flex-row items-center gap-3">
-              
               {/* Push to sheet */}
-              <TooltipButton message="Push to sheet" variant="ghost" size="icon" onClick={() => pushToSheet()}>
-                <RxUpload className='text-xl m-0 p-0'/>
+              <TooltipButton
+                message="Push to sheet"
+                variant="ghost"
+                size="icon"
+                onClick={() => pushToSheet()}
+              >
+                <RxUpload className="text-xl m-0 p-0" />
               </TooltipButton>
 
               {/* Copy to clipboard */}
-              <TooltipButton message="Copy to clipboard" variant="ghost" size="icon" onClick={() => copyToClipboard()}>
-                <RxClipboardCopy className='text-xl m-0 p-0'/>
+              <TooltipButton
+                message="Copy to clipboard"
+                variant="ghost"
+                size="icon"
+                onClick={() => copyToClipboard()}
+              >
+                <RxClipboardCopy className="text-xl m-0 p-0" />
               </TooltipButton>
-              
+
               {/* Filters */}
               <DropdownMenu>
                 <DropdownMenuTrigger>
                   <Button variant="ghost">
                     Filters
-                    <GoChevronDown className='ml-2'/>
+                    <GoChevronDown className="ml-2" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                    <DropdownMenuLabel>Select query language</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <div className="flex items-center space-x-2 m-2">
-                      <Switch
-                        id="data-cleaner"
-                        checked={cleanerSwitch}
-                        onCheckedChange={() => setCleanersSwitch(!cleanerSwitch)}
-                      />
-                      <Label htmlFor="data-cleaner">Remove special characters</Label>
-                    </div>
-                    {
-                      cleanerSwitch && 
-                      <>
-                        <div className="flex items-center space-x-2 m-2">
-                          <Switch
-                            id="remove-trailing-spaces"
-                            checked={removeTrailingSpace}
-                            onCheckedChange={() => setRemoveTrailingSpace(!removeTrailingSpace)}
-                            disabled={removeAllSpace}
-                          />
-                          <Label htmlFor="remove-trailing-spaces">Remove trailing spaces</Label>
-                        </div>
-                        <div className="flex items-center space-x-2 m-2">
-                          <Switch
-                            id="remove-all-spaces"
-                            checked={removeAllSpace}
-                            onCheckedChange={() => setRemoveAllSpace(!removeAllSpace)}
-                          />
-                          <Label htmlFor="remove-all-spaces">Remove all spaces</Label>
-                        </div>
-                      </>
-                    }
+                  <DropdownMenuLabel>Select query language</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <div className="flex items-center space-x-2 m-2">
+                    <Switch
+                      id="data-cleaner"
+                      checked={cleanerOptions.enabled}
+                      onCheckedChange={() =>
+                        setCleanerOptions((prev) => ({
+                          ...prev,
+                          enabled: !prev.enabled,
+                        }))
+                      }
+                    />
+                    <Label htmlFor="data-cleaner">
+                      Remove special characters
+                    </Label>
+                  </div>
+                  {cleanerOptions.enabled && (
+                    <>
+                      <div className="flex items-center space-x-2 m-2">
+                        <Switch
+                          id="remove-trailing-spaces"
+                          checked={cleanerOptions.removeTrailingSpace}
+                          onCheckedChange={() =>
+                            setCleanerOptions((prev) => ({
+                              ...prev,
+                              removeTrailingSpace: !prev.removeTrailingSpace,
+                            }))
+                          }
+                          disabled={cleanerOptions.removeAllSpace}
+                        />
+                        <Label htmlFor="remove-trailing-spaces">
+                          Remove trailing spaces
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2 m-2">
+                        <Switch
+                          id="remove-all-spaces"
+                          checked={cleanerOptions.removeAllSpace}
+                          onCheckedChange={() =>
+                            setCleanerOptions((prev) => ({
+                              ...prev,
+                              removeAllSpace: !prev.removeAllSpace,
+                            }))
+                          }
+                        />
+                        <Label htmlFor="remove-all-spaces">
+                          Remove all spaces
+                        </Label>
+                      </div>
+                    </>
+                  )}
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
@@ -207,7 +243,7 @@ const JsonInput = (props) => {
         value={cleanedValue}
         onChange={onChange}
         options={{
-          readOnly: readOnly
+          readOnly: readOnly,
         }}
       />
     </>
